@@ -1,0 +1,30 @@
+/* ───────────────────────────────────────────────────────────────
+   SPACING & RADIUS — 4px base grid. Logical-property friendly:
+   use these for margin/padding/gap so RTL mirroring is automatic.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  8px;
+  --space-4:  12px;
+  --space-5:  16px;
+  --space-6:  20px;
+  --space-7:  24px;
+  --space-8:  32px;
+  --space-9:  48px;
+  --space-10: 64px;
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius:      8px;    /* default — cards, inputs, buttons */
+  --radius-lg:   12px;   /* modals, large panels             */
+  --radius-full: 999px;  /* pills, badges, avatars           */
+
+  /* Shell metrics — fixed chrome dimensions */
+  --topbar-h:        52px;
+  --sidebar-w:       240px;
+  --sidebar-w-collapsed: 60px;
+  --drawer-w:        460px;
+  --orders-panel-w:  320px;
+}

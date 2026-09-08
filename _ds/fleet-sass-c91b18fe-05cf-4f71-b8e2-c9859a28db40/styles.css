@@ -1,0 +1,19 @@
+/* ════════════════════════════════════════════════════════════════
+   Fleet SaaS — Design System global stylesheet.
+   Consumers link THIS one file. It is an import manifest only;
+   never add rules here. Order matters: palette → theme → scales →
+   base, so semantic aliases resolve before anything uses them.
+   ════════════════════════════════════════════════════════════════ */
+@import "./tokens/palette.css";
+@import "./tokens/theme.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/elevation.css";
+@import "./tokens/base.css";
+
+/* Component styles — shipped so primitives carry their own look. */
+@import "./components/forms/forms.css";
+@import "./components/feedback/feedback.css";
+@import "./components/data/data.css";
+@import "./components/overlay/overlay.css";
+@import "./components/navigation/navigation.css";

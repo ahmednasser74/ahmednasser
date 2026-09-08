@@ -1,0 +1,45 @@
+/* ───────────────────────────────────────────────────────────────
+   BASE — minimal reset + element defaults that read from tokens.
+   Applies the dark theme look to the document by default.
+   ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Accessible focus — visible ring only for keyboard users.
+   Every interactive primitive opts into this token. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Selection */
+::selection { background: var(--primary-soft-hover); color: var(--text); }
+
+/* Custom scrollbars — slim, theme-aware (dispatcher screens scroll a lot) */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
+
+/* ── RTL ──────────────────────────────────────────────────────
+   The console ships full Arabic. Components are built with logical
+   properties so direction flips for free; these are the few global
+   nudges. Set dir="rtl" on <html> to activate. */
+[dir="rtl"] { text-align: right; }
+[dir="rtl"] .mono,
+[dir="rtl"] .tabular { direction: ltr; unicode-bidi: plaintext; } /* keep IDs/coords LTR */

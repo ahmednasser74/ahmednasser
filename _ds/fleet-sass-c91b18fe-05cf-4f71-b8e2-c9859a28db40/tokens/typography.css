@@ -1,0 +1,41 @@
+/* ───────────────────────────────────────────────────────────────
+   TYPOGRAPHY — system-ui stack, tabular numerics for operational
+   data. No webfonts: the console runs offline-first on dispatcher
+   machines and must render instantly with native UI fonts.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Type ramp (px) — 14 is base/body */
+  --text-xs:   12px;   /* meta, table column heads, badges      */
+  --text-sm:   13px;   /* dense table cells, helper text         */
+  --text-base: 14px;   /* body — the console default            */
+  --text-md:   16px;   /* emphasized body, drawer field labels  */
+  --text-lg:   20px;   /* page titles (h1)                      */
+  --text-xl:   24px;   /* section headers                       */
+  --text-2xl:  30px;   /* KPI numbers, hero figures             */
+
+  /* Line heights */
+  --leading-tight:  1.2;
+  --leading-snug:   1.35;
+  --leading-normal: 1.5;
+
+  /* Weights */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Letter spacing — used on uppercase eyebrow/label text */
+  --tracking-wide:  0.04em;
+  --tracking-wider: 0.12em;
+
+  font-family: var(--font-sans);
+}
+
+/* Tabular numerics — apply to IDs, coordinates, money, counts,
+   timestamps so columns align and digits don't jitter on update. */
+.tabular,
+.mono { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-mono); }

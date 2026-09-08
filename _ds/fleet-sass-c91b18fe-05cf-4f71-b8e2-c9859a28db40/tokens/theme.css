@@ -1,0 +1,97 @@
+/* ───────────────────────────────────────────────────────────────
+   THEME — semantic color roles. Components reference ONLY these.
+   Dark is the hero theme (applied at :root). Light is opt-in via
+   [data-theme="light"] (or .theme-light) on <html>/<body>.
+   Every value is AA-checked for its intended text/background pair.
+   ─────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces — back to front */
+  --bg:          var(--night-904);   /* app background        */
+  --surface:     #1b2535;            /* cards, panels         */
+  --surface-2:   #182232;            /* nested / elevated     */
+  --surface-3:   #202d40;            /* hover fills, inputs   */
+  --overlay:     rgba(3, 8, 18, .55);/* scrim behind modals   */
+
+  /* Borders */
+  --border:      #222c3c;            /* default divider       */
+  --border-soft: #283345;            /* lighter divider/inputs*/
+  --border-strong:#34425a;           /* focus-adjacent edges  */
+
+  /* Text — all AA on --surface or --bg */
+  --text:        #e6edf6;            /* primary               */
+  --text-muted:  #9aa7bb;            /* secondary (AA bumped) */
+  --text-subtle: #6b7a90;            /* tertiary / disabled   */
+  --text-on-primary: #ffffff;        /* text over --primary   */
+
+  /* Brand */
+  --primary:        var(--sky-500);
+  --primary-hover:  var(--sky-400);
+  --primary-active: var(--sky-600);
+  --primary-soft:   rgba(52, 133, 226, .16); /* tinted fill   */
+  --primary-soft-hover: rgba(52, 133, 226, .24);
+  --focus-ring:     rgba(97, 160, 232, .55);
+
+  /* Semantic */
+  --success:      var(--green-400);
+  --success-soft: rgba(74, 222, 128, .14);
+  --warning:      var(--amber-400);
+  --warning-soft: rgba(251, 191, 36, .14);
+  --danger:       var(--red-400);
+  --danger-soft:  rgba(248, 113, 113, .14);
+  --danger-hover: #fb8a8a;
+  --info:         var(--blue-400);
+  --info-soft:    rgba(97, 160, 232, .14);
+
+  /* Domain status — drivers / vehicles / orders */
+  --status-online:  var(--success);   /* online / active     */
+  --status-offline: var(--text-subtle);/* offline / idle      */
+  --status-busy:    var(--info);      /* busy / en-route     */
+  --status-error:   var(--danger);    /* error / cancelled   */
+  --status-pending: var(--warning);   /* pending             */
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg:          var(--slate-50);
+  --surface:     var(--white);
+  --surface-2:   var(--slate-100);
+  --surface-3:   #e9eef5;
+  --overlay:     rgba(15, 25, 41, .35);
+
+  --border:      var(--slate-200);
+  --border-soft: #eaeff5;
+  --border-strong:#cbd5e1;
+
+  --text:        var(--slate-900);
+  --text-muted:  #5b6675;
+  --text-subtle: #8a97a8;
+  --text-on-primary: #ffffff;
+
+  --primary:        var(--sky-600);
+  --primary-hover:  var(--sky-500);
+  --primary-active: var(--sky-700);
+  --primary-soft:   rgba(28, 108, 199, .10);
+  --primary-soft-hover: rgba(28, 108, 199, .16);
+  --focus-ring:     rgba(28, 108, 199, .45);
+
+  --success:      var(--green-600);
+  --success-soft: rgba(22, 163, 74, .12);
+  --warning:      var(--amber-600);
+  --warning-soft: rgba(217, 119, 6, .12);
+  --danger:       var(--red-600);
+  --danger-soft:  rgba(220, 38, 38, .10);
+  --danger-hover: #b91c1c;
+  --info:         var(--blue-600);
+  --info-soft:    rgba(37, 99, 235, .10);
+
+  --status-online:  var(--success);
+  --status-offline: var(--text-subtle);
+  --status-busy:    var(--info);
+  --status-error:   var(--danger);
+  --status-pending: var(--warning);
+}

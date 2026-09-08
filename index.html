@@ -327,12 +327,24 @@ class Component extends DCLogic {
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('[data-reveal]').forEach(el => obs.observe(el));
     this._runTyper(0, 0, false);
+    this._startShotInterval();
+    this._onVisibilityChange = () => {
+      if (document.hidden) { this._stopShotInterval(); } else { this._startShotInterval(); }
+    };
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
+  }
+  _startShotInterval() {
+    if (this._shotInterval) return;
     this._shotInterval = setInterval(() => {
       this.setState({ shotFading: true });
       setTimeout(() => {
         this.setState(s => ({ shotIdx: s.shotIdx + 1, shotFading: false }));
       }, 400);
     }, 3000);
+  }
+  _stopShotInterval() {
+    clearInterval(this._shotInterval);
+    this._shotInterval = null;
   }
   _runTyper(roleIdx, charIdx, deleting) {
     const role = this.typerRoles[roleIdx];
@@ -345,7 +357,11 @@ class Component extends DCLogic {
     else if (deleting && nextChar < 0) { nextChar = 0; nextDeleting = false; nextRole = (roleIdx + 1) % this.typerRoles.length; delay = 300; }
     this._typerTimeout = setTimeout(() => this._runTyper(nextRole, nextChar, nextDeleting), delay);
   }
-  componentWillUnmount() { clearTimeout(this._typerTimeout); clearInterval(this._shotInterval); }
+  componentWillUnmount() {
+    clearTimeout(this._typerTimeout);
+    this._stopShotInterval();
+    document.removeEventListener('visibilitychange', this._onVisibilityChange);
+  }
   iconDataUri(name, color) {
     const paths = {
       pin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>',

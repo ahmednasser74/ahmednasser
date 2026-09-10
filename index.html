@@ -209,23 +209,31 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));grid-auto-rows:1fr;align-items:stretch;gap:var(--space-4)">
       <sc-for list="{{ backendProjects }}" as="proj" hint-placeholder-count="6">
-        <sc-if value="{{ proj.visible }}" hint-placeholder-val="{{ true }}">
-          <div class="card elev-sm lift" data-reveal="true" style="padding:0;display:flex;flex-direction:column;overflow:hidden;height:100%">
-            <div style="padding:20px;background:linear-gradient(135deg,var(--color-accent-100),var(--color-accent-2-100));display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
-              <div style="width:32px;height:32px;background-image:url('{{ proj.iconSrc }}');background-size:contain;background-position:center;background-repeat:no-repeat"></div>
+        <div class="card elev-sm lift" data-reveal="true" style="padding:var(--space-4);flex-direction:column;gap:12px;height:100%;display:{{ proj.display }}">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="width:44px;height:44px;flex-shrink:0;border-radius:var(--radius-md);background-color:var(--color-neutral-100);background-image:url('{{ proj.logo }}');background-size:contain;background-position:center;background-repeat:no-repeat"></div>
+            <div style="min-width:0;flex:1;padding-top:2px">
+              <div class="card-title" style="font-family:var(--font-heading);font-size:16px;line-height:1.3;margin-bottom:6px">{{ proj.title }}</div>
               <span class="tag tag-accent-2">{{ proj.category }}</span>
             </div>
-            <div style="padding:var(--space-4);display:flex;flex-direction:column;gap:10px;flex:1">
-              <div class="card-title" style="font-family:var(--font-heading);font-size:17px">{{ proj.title }}</div>
-              <p class="card-body" style="font-size:14px;line-height:1.6;color:var(--color-neutral-700);margin:0;flex:1">{{ proj.body }}</p>
-              <div style="display:flex;flex-wrap:wrap;gap:6px">
-                <sc-for list="{{ proj.tagChips }}" as="t" hint-placeholder-count="4">
-                  <span class="tag tag-neutral" style="font-size:11px">{{ t }}</span>
-                </sc-for>
-              </div>
-            </div>
           </div>
-        </sc-if>
+          <p class="card-body" style="font-size:14px;line-height:1.6;color:var(--color-neutral-700);margin:0">{{ proj.body }}</p>
+          <sc-if value="{{ proj.hasStats }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:nowrap;gap:20px;padding-top:10px;border-top:1px solid var(--color-neutral-200)">
+              <sc-for list="{{ proj.stats }}" as="s" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-family:var(--font-heading);font-size:22px;line-height:1.1;color:var(--color-accent)">{{ s.value }}</span>
+                  <span style="font-size:11px;line-height:1.3;color:var(--color-neutral-600)">{{ s.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ proj.tagChips }}" as="t" hint-placeholder-count="4">
+              <span class="tag tag-neutral" style="font-size:11px">{{ t }}</span>
+            </sc-for>
+          </div>
+        </div>
       </sc-for>
     </div>
   </div>
@@ -484,9 +492,11 @@ class Component extends DCLogic {
       };
     });
     const backendProjects = this._backendProjects().map(function(p) {
+      const visible = backendFilter === 'All' || backendFilter === p.category;
       return Object.assign({}, p, {
-        iconSrc: self.iconDataUri('database', '#3355e6'),
-        visible: backendFilter === 'All' || backendFilter === p.category
+        hasStats: !!(p.stats && p.stats.length),
+        visible: visible,
+        display: visible ? 'flex' : 'none'
       });
     });
     return {
@@ -553,13 +563,13 @@ class Component extends DCLogic {
   }
   _backendProjects() {
     return [
-        { title: "Madar — B2B Vendor Gateway", category: "Billing & Payments", body: "Sole author (88% of the code) of Madar's B2B vendor gateway — idempotent billing on BullMQ with a dead-letter queue and operator redrive, a delete-resistant audit trail, and distributed rate limiting.", tagChips: ["NestJS", "BullMQ", "Dead-letter Queue", "Audit Trail"] },
-        { title: "Madar — Truck Routing & Invoicing", category: "Logistics Management", body: "Truck-order planning and route optimisation — grouping orders by type, allocating them across the fleet and selecting routes that minimise time and distance — plus an invoicing module with PDF export, partial payments and Redis caching on high-traffic lookups.", tagChips: ["NestJS", "PostgreSQL", "Route Optimisation", "Redis"] },
-        { title: "Madar — Nupco Integration", category: "Enterprise Integrations", body: "Led the integration, end to end, that routes orders from Nupco — one of Saudi Arabia's largest medicine distributors — into Madar over RabbitMQ.", tagChips: ["RabbitMQ", "Order Routing", "NestJS"] },
-        { title: "Madar — Fleet–Driver Chat", category: "Real-time Systems", body: "Sole author of the real-time fleet-driver chat: Firestore for live messaging, PostgreSQL as the system of record, synced through a Cloud Function and an HMAC-signed webhook. Closed a lost-write race with one upsert; ~350 tests at a 1.65:1 test-to-code ratio.", tagChips: ["Firestore", "Cloud Functions", "HMAC Webhooks"] },
-        { title: "Towa Logistics Platform", category: "Microservices Architecture", body: "Architected a 13-service NestJS platform from scratch — domain services, auth, API gateway and real-time tracking — on AWS EC2. In production since Jul 2026: 134 drivers, 631 customers, 21 factories. Zero-trust identity handoff across 54 entities, 260 endpoints and 259 RBAC permissions, plus a SAP integration and a 12-state order lifecycle driven by 6 geofencing strategies.", tagChips: ["NestJS", "AWS EC2", "SAP Integration", "Geofencing"] },
-        { title: "Shohnety — Logistics SaaS", category: "Multi-Tenant SaaS", body: "Founder and sole author (96% of commits) of a 15-service, multi-tenant NestJS backend for an early-stage logistics SaaS — 286 endpoints, 62 entities, 137 migrations, serving 5 client platforms. Tenancy enforced at the repository layer, gated by an 8-spec architecture-conformance suite that blocks merges in CI.", tagChips: ["NestJS", "Multi-tenancy", "PostgreSQL", "Angular"] },
-        { title: "AI-Assisted Engineering Tooling", category: "AI & Developer Tooling", body: "Authored 21 custom agent skills (~2,170 lines of scaffolding) that generate convention-conforming services, modules and migrations over a versioned agent-context system, with spec-driven planning through GitHub Spec Kit and MCP servers wired to real repository, API and database state.", tagChips: ["Spec-Driven Dev", "GitHub Spec Kit", "MCP", "Automation"] }
+        { title: "Shohnety — Multi-Tenant SaaS", category: "Multi-Tenant SaaS", logo: "assets/shohnety_logo.png", stats: [{ value: "96%", label: "of backend commits, solo" }, { value: "76%", label: "of the Angular console" }], body: "Founder and solo full-stack builder of an early-stage, multi-tenant logistics SaaS — a 15-service NestJS backend (286 endpoints, 62 entities, 137 migrations) and a 4-app Angular console, serving 5 client platforms. Tenancy enforced at the repository layer, gated by an 8-spec architecture-conformance suite that blocks merges in CI.", tagChips: ["NestJS", "Angular", "Multi-tenancy", "JWT Refresh", "RBAC", "Docker", "PostgreSQL"] },
+        { title: "Towa Logistics Platform", category: "Microservices Architecture", logo: "assets/towa_logo.png", stats: [{ value: "13", label: "services from scratch" }], body: "Architected a 13-service NestJS platform from scratch — domain services, auth, API gateway and real-time tracking — on AWS EC2. In production since Jul 2026: 134 drivers, 631 customers, 21 factories. Zero-trust identity handoff across 54 entities, 260 endpoints and 259 RBAC permissions, plus a SAP integration and a 12-state order lifecycle driven by 6 geofencing strategies.", tagChips: ["NestJS", "Zero-Trust JWT", "RBAC", "Docker", "AWS EC2", "SAP Integration", "Geofencing"] },
+        { title: "Madar — B2B Vendor Gateway", category: "Billing & Payments", logo: "https://www.google.com/s2/favicons?domain=madar.app&sz=128", stats: [{ value: "88%", label: "of the code, solo" }], body: "Sole author of Madar's B2B vendor gateway — idempotent billing on BullMQ with a dead-letter queue and operator redrive, a delete-resistant audit trail, and distributed rate limiting. Platform-wide, OTP and login flows are also gated by Google reCAPTCHA v3.", tagChips: ["NestJS", "BullMQ", "Dead-letter Queue", "Rate Limiting", "Recaptcha", "Audit Trail"] },
+        { title: "Madar — Truck Routing & Invoicing", category: "Logistics Management", logo: "https://www.google.com/s2/favicons?domain=madar.app&sz=128", body: "Truck-order planning and route optimisation — grouping orders by type, allocating them across the fleet and selecting routes that minimise time and distance — plus an invoicing module with PDF export, partial payments and Redis caching on high-traffic lookups.", tagChips: ["NestJS", "PostgreSQL", "Route Optimisation", "Redis"] },
+        { title: "Madar — Nupco Integration", category: "Enterprise Integrations", logo: "https://www.google.com/s2/favicons?domain=madar.app&sz=128", body: "Led the integration, end to end, that routes orders from Nupco — one of Saudi Arabia's largest medicine distributors — into Madar over RabbitMQ.", tagChips: ["RabbitMQ", "Order Routing", "NestJS"] },
+        { title: "Madar — Fleet–Driver Chat", category: "Real-time Systems", logo: "https://www.google.com/s2/favicons?domain=madar.app&sz=128", stats: [{ value: "350", label: "tests, 1.65:1 ratio" }], body: "Sole author of the real-time fleet-driver chat: Firestore for live messaging, PostgreSQL as the system of record, synced through a Cloud Function and an HMAC-signed webhook. Closed a lost-write race with one upsert.", tagChips: ["Firestore", "Cloud Functions", "HMAC Webhooks"] },
+        { title: "AI-Assisted Engineering Tooling", category: "AI & Developer Tooling", logo: "https://cdn.simpleicons.org/claude/D97757", stats: [{ value: "21", label: "custom agent skills" }], body: "Authored custom agent skills (~2,170 lines of scaffolding) that generate convention-conforming services, modules and migrations over a versioned agent-context system, with spec-driven planning through GitHub Spec Kit and MCP servers wired to real repository, API and database state.", tagChips: ["Spec-Driven Dev", "GitHub Spec Kit", "MCP", "Automation"] }
     ];
   }
   _projects() {

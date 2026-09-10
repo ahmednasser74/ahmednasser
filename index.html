@@ -35,6 +35,20 @@
   .btn-anim:hover{transform:translateY(-2px) scale(1.02)}
   .type-cursor{display:inline-block;margin-left:2px;animation:typeBlink 1s step-end infinite;color:var(--color-accent)}
   @keyframes typeBlink{50%{opacity:0}}
+  .shot-stage{position:absolute;inset:0;overflow:hidden}
+  .shot-layer{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;backface-visibility:hidden;will-change:transform}
+  .shot-prev{transform:translateX(-100%)}
+  @keyframes shotInA{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes shotInB{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes shotOutA{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  @keyframes shotOutB{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  .slide-in-a{animation:shotInA .6s cubic-bezier(.22,1,.36,1) both}
+  .slide-in-b{animation:shotInB .6s cubic-bezier(.22,1,.36,1) both}
+  .slide-out-a{animation:shotOutA .6s cubic-bezier(.22,1,.36,1) both}
+  .slide-out-b{animation:shotOutB .6s cubic-bezier(.22,1,.36,1) both}
+  @media (prefers-reduced-motion: reduce){
+    .slide-in-a,.slide-in-b,.slide-out-a,.slide-out-b{animation:none}
+  }
   @media (max-width: 900px) {
     [data-nav-links="true"] { display: none !important; }
     [data-nav-btn="true"] { display: inline-flex !important; }
@@ -198,7 +212,10 @@
                 <sc-if value="{{ proj.showNotch }}" hint-placeholder-val="{{ true }}">
                   <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);width:34px;height:6px;border-radius:4px;background:#111;z-index:2"></div>
                 </sc-if>
-                <div style="width:100%;height:100%;background-color:#111;background-image:url('{{ proj.activeShot }}');background-size:cover;background-position:center;transition:opacity .4s ease;opacity:{{ proj.shotOpacity }}"></div>
+                <div class="shot-stage">
+                  <div class="shot-layer shot-prev {{ proj.outClass }}" style="background-image:url('{{ proj.prevShot }}')"></div>
+                  <div class="shot-layer {{ proj.inClass }}" style="background-image:url('{{ proj.activeShot }}')"></div>
+                </div>
               </div>
             </div>
           </sc-if>
@@ -213,7 +230,10 @@
                   <div class="card-title" style="font-family:var(--font-heading);font-size:18px">{{ proj.title }}</div>
                   <p class="card-body" style="font-size:14px;line-height:1.6;color:var(--color-neutral-700);margin:0">{{ proj.body }}</p>
                 </div>
-                <div style="flex-shrink:0;width:90px;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background-color:var(--color-neutral-900);background-image:url('{{ proj.rawShot }}');background-size:cover;background-position:center;transition:opacity .4s ease;opacity:{{ proj.shotOpacity }}"></div>
+                <div style="flex-shrink:0;width:90px;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background-color:var(--color-neutral-900);position:relative">
+                  <div class="shot-layer shot-prev {{ proj.outClass }}" style="background-image:url('{{ proj.prevRawShot }}')"></div>
+                  <div class="shot-layer {{ proj.inClass }}" style="background-image:url('{{ proj.rawShot }}')"></div>
+                </div>
               </div>
             </sc-if>
             <sc-if value="{{ proj.noRawShot }}" hint-placeholder-val="{{ true }}">
@@ -309,7 +329,7 @@
 <script type="text/x-dc" data-dc-script>
 
 class Component extends DCLogic {
-  state = { navOpen: false, typedText: '', shotIdx: 0, shotFading: false };
+  state = { navOpen: false, typedText: '', shotIdx: 0 };
   typerRoles = ['Senior Backend Engineer', 'Mobile Engineer', 'Backend & Mobile Engineer'];
   waiteryShots = ['assets/waitery_shot1.jpg', 'assets/waitery_shot2.jpg', 'assets/waitery_shot3.jpg', 'assets/waitery_shot4.jpg'];
   imhungryShots = ['assets/imhungry_shot1.jpg', 'assets/imhungry_shot2.jpg'];
@@ -338,12 +358,20 @@ class Component extends DCLogic {
   }
   _startShotInterval() {
     if (this._shotInterval) return;
+    this._preloadShots(this.state.shotIdx + 1);
     this._shotInterval = setInterval(() => {
-      this.setState({ shotFading: true });
-      setTimeout(() => {
-        this.setState(s => ({ shotIdx: s.shotIdx + 1, shotFading: false }));
-      }, 400);
-    }, 3000);
+      this.setState(s => ({ shotIdx: s.shotIdx + 1 }));
+      this._preloadShots(this.state.shotIdx + 2);
+    }, 3200);
+  }
+  _preloadShots(idx) {
+    const self = this;
+    this._projects().forEach(function(p) {
+      const set = p.shotSet ? self[p.shotSet] : (p.rawShotSet ? self[p.rawShotSet] : null);
+      if (!set || !set.length) return;
+      const img = new Image();
+      img.src = set[idx % set.length];
+    });
   }
   _stopShotInterval() {
     clearInterval(this._shotInterval);
@@ -385,6 +413,7 @@ class Component extends DCLogic {
     var self = this;
     const experience = this._experience().map(function(j) { return Object.assign({}, j, { iconSrc: j.icon || PIXEL }); });
     const shotIdx = this.state.shotIdx;
+    const slidePar = shotIdx % 2 ? 'a' : 'b';
     const self2 = this;
     const projects = this._projects().map(function(p) {
       const iconSrc = p.imgSrc || p.favicon || '';
@@ -392,7 +421,11 @@ class Component extends DCLogic {
       const activeShot = shotSet ? shotSet[shotIdx % shotSet.length] : '';
       const rawSet = p.rawShotSet ? self2[p.rawShotSet] : null;
       const rawShot = rawSet ? rawSet[shotIdx % rawSet.length] : '';
-      return Object.assign({}, p, { iconSrc: iconSrc, hasAnyIcon: !!iconSrc, hasAnyIconNoRaw: !!iconSrc && !rawSet, activeShot: activeShot, screenshots: !!shotSet, showNotch: p.showNotch !== false, rawShot: rawShot, noRawShot: !rawSet, noFavicon: p.noFavicon && !rawSet, noScreenshots: !shotSet, shotOpacity: self2.state.shotFading ? 0 : 1 });
+      const slideSet = shotSet || rawSet;
+      const slides = shotIdx > 0 && slideSet && slideSet.length > 1;
+      const prevShot = slides && shotSet ? shotSet[(shotIdx - 1) % shotSet.length] : '';
+      const prevRawShot = slides && rawSet ? rawSet[(shotIdx - 1) % rawSet.length] : '';
+      return Object.assign({}, p, { iconSrc: iconSrc, hasAnyIcon: !!iconSrc, hasAnyIconNoRaw: !!iconSrc && !rawSet, activeShot: activeShot, screenshots: !!shotSet, showNotch: p.showNotch !== false, rawShot: rawShot, noRawShot: !rawSet, noFavicon: p.noFavicon && !rawSet, noScreenshots: !shotSet, prevShot: prevShot || PIXEL, prevRawShot: prevRawShot || PIXEL, inClass: slides ? 'slide-in-' + slidePar : '', outClass: slides ? 'slide-out-' + slidePar : '' });
     });
     const skillGroups = this._skillGroups().map(function(g) {
       return Object.assign({}, g, { items: g.items.map(function(it) {
